@@ -1,4 +1,4 @@
-# Market-Analysis-of-Tech-Product-Sales-Using-Business-Intelligence.
+# Market Analysis of Tech Product Sales Using Business Intelligence
 # Tech Sales Market Analysis
 
 ## Project Title
