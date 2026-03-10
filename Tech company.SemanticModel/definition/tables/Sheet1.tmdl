@@ -1,0 +1,122 @@
+table Sheet1
+	lineageTag: cdf780cc-6f86-48ce-a6ea-0336e91e1ace
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4ba8f5df-c957-4055-b340-19a49b1ea00b
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variation
+			isDefault
+			relationship: 0f4267a0-a907-4d57-a534-15996c61d2be
+			defaultHierarchy: LocalDateTable_3c4e04f5-8e2b-44e2-9908-ef472dca04c5.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Product Name'
+		dataType: string
+		lineageTag: 2fe9b39c-c349-44d1-a120-5c57eee5ddf3
+		summarizeBy: none
+		sourceColumn: Product Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 34a4711e-2283-4647-b9aa-049c739a08fe
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Quantity Sold'
+		dataType: int64
+		formatString: 0
+		lineageTag: ea438788-3da1-4794-bd90-c25044fa1be5
+		summarizeBy: sum
+		sourceColumn: Quantity Sold
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unit Price'
+		dataType: int64
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 82c67c77-0681-47a5-a03d-4b2e6d5a89de
+		summarizeBy: sum
+		sourceColumn: Unit Price
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: double
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 6b53a21d-0b96-48b4-bbe2-03647601bf12
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 90c3b89e-5f53-4afe-8244-7399c7b69b36
+		dataCategory: Continent
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer Type'
+		dataType: string
+		lineageTag: 87108978-31d3-4fce-8afa-15cac5bbb24d
+		summarizeBy: none
+		sourceColumn: Customer Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Discount Applied (%)'
+		dataType: int64
+		formatString: 0%;-0%;0%
+		lineageTag: 4b0e1d5c-a712-476e-89f9-2c1d52980c24
+		summarizeBy: sum
+		sourceColumn: Discount Applied (%)
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Payment Method'
+		dataType: string
+		lineageTag: 61a6a162-1c29-447c-988e-9ca06b6b31b7
+		summarizeBy: none
+		sourceColumn: Payment Method
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sales Channel'
+		dataType: string
+		lineageTag: 71baeadd-1208-41ca-a036-a94e8ae20f88
+		summarizeBy: none
+		sourceColumn: Sales Channel
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Sheet1 = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\Ugochukwu\Downloads\Tech_Company_Sales_Dataset_4_Years.xlsx"), null, true),
+				    Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Transaction ID", type text}, {"Date", type date}, {"Product Name", type text}, {"Category", type text}, {"Quantity Sold", Int64.Type}, {"Unit Price", Int64.Type}, {"Revenue", type number}, {"Region", type text}, {"Customer Type", type text}, {"Discount Applied (%)", Int64.Type}, {"Payment Method", type text}, {"Sales Channel", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Transaction ID"}),
+				    #"Removed Errors" = Table.RemoveRowsWithErrors(#"Removed Columns", {"Product Name"}),
+				    #"Removed Blank Rows" = Table.SelectRows(#"Removed Errors", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null})))
+				in
+				    #"Removed Blank Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
